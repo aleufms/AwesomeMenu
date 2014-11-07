@@ -284,17 +284,15 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
 }
 
 -(void)refreshButton{
-    // rotate add button
-    //    float angle = self.isExpanding ? -M_PI_4 : 0.0f;
-    //    _addButton.transform = CGAffineTransformMakeRotation(angle);
-    
     _startButton.contentImageView.image = self.isExpanding ? [[UIImage imageNamed:@"icon-close"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] : self.originalContentImage;
     [_startButton setNeedsLayout];
     [_startButton layoutIfNeeded];
     [UIView animateWithDuration:kAwesomeMenuStartMenuDefaultAnimationDuration animations:^{
         if (self.isExpanding){
             CGSize finalSize = CGSizeMake(45.0f, 45.0f);
-            _startButton.transform = CGAffineTransformMakeScale(finalSize.height/_startButton.bounds.size.height, finalSize.width/_startButton.bounds.size.width);
+            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(finalSize.height/_startButton.bounds.size.height, finalSize.width/_startButton.bounds.size.width);
+            CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(M_PI);
+            _startButton.transform = CGAffineTransformConcat(scaleTransform, rotateTransform);
             _startButton.tintColor = [UIColor colorWithRed:207/255.0f green:53/255.0 blue:53/255.0 alpha:1];
             self.backgroundColor = [UIColor colorWithWhite:0 alpha:.4f];
         }
@@ -302,6 +300,13 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
             _startButton.transform = CGAffineTransformIdentity;
             _startButton.tintColor = self.originalContentTintColor;
             self.backgroundColor = [UIColor clearColor];
+        }
+    } completion:^(BOOL finished) {
+        if (self.isExpanding){
+            CGSize finalSize = CGSizeMake(45.0f, 45.0f);
+            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(finalSize.height/_startButton.bounds.size.height, finalSize.width/_startButton.bounds.size.width);
+            CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(0);
+            _startButton.transform = CGAffineTransformConcat(scaleTransform, rotateTransform);
         }
     }];
 }
