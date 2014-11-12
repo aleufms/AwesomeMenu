@@ -52,7 +52,7 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
     BOOL _isAnimating;
 }
 
-@synthesize nearRadius, endRadius, farRadius, timeOffset, rotateAngle, menuWholeAngle, startPoint, expandRotation, closeRotation, animationDuration, rotateAddButton;
+@synthesize nearRadius, endRadius, farRadius, timeOffset, rotateAngle, menuWholeAngle, startPoint, expandRotation, closeRotation, animationDuration, rotateAddButton, fadeWhenClose;
 @synthesize expanding = _expanding;
 @synthesize delegate = _delegate;
 @synthesize menusArray = _menusArray;
@@ -75,6 +75,7 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
         self.closeRotation = kAwesomeMenuDefaultCloseRotation;
         self.animationDuration = kAwesomeMenuDefaultAnimationDuration;
         self.rotateAddButton = YES;
+        self.fadeWhenClose = NO;
         
         self.menusArray = aMenusArray;
         
@@ -287,6 +288,7 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
     _startButton.contentImageView.image = self.isExpanding ? [[UIImage imageNamed:@"icon-close"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] : self.originalContentImage;
     [_startButton setNeedsLayout];
     [_startButton layoutIfNeeded];
+    
     [UIView animateWithDuration:kAwesomeMenuStartMenuDefaultAnimationDuration animations:^{
         if (self.isExpanding){
             CGSize finalSize = CGSizeMake(45.0f, 45.0f);
@@ -325,6 +327,8 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
     
     NSUInteger tag = 1000 + _flag;
     AwesomeMenuItem *item = (AwesomeMenuItem *)[self viewWithTag:tag];
+    
+    item.layer.opacity = 1;
     
     CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
     rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:expandRotation],[NSNumber numberWithFloat:0.0f], nil];
@@ -390,8 +394,13 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
     positionAnimation.path = path;
     CGPathRelease(path);
     
+    item.layer.opacity = (self.fadeWhenClose) ? 0 : 1;
+    CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    opacityAnimation.fromValue = @(1.0);
+    opacityAnimation.toValue  = @(item.layer.opacity);
+    
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
-    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
+    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, opacityAnimation, nil];
     animationgroup.duration = animationDuration;
     animationgroup.fillMode = kCAFillModeForwards;
     animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
