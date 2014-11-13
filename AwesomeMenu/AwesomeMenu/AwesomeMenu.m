@@ -259,15 +259,27 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
 {
     if (expanding) {
         [self _setMenu];
+        if(self.delegate && [self.delegate respondsToSelector:@selector(awesomeMenuShouldOpen:)]){
+            if (![self.delegate awesomeMenuShouldOpen:self])
+                return;
+        }
+        
         if(self.delegate && [self.delegate respondsToSelector:@selector(awesomeMenuWillAnimateOpen:)]){
             [self.delegate awesomeMenuWillAnimateOpen:self];
+        }
+    }else{
+        if(self.delegate && [self.delegate respondsToSelector:@selector(awesomeMenuShouldClose:)]){
+            if (![self.delegate awesomeMenuShouldClose:self])
+                return;
+        }
+        
+        if(self.delegate && [self.delegate respondsToSelector:@selector(awesomeMenuWillAnimateClose:)]){
+            [self.delegate awesomeMenuWillAnimateClose:self];
         }
     }
     
     _expanding = expanding;
-    if(self.delegate && [self.delegate respondsToSelector:@selector(awesomeMenuWillAnimateClose:)]){
-        [self.delegate awesomeMenuWillAnimateClose:self];
-    }
+    
     
     [self refreshButton];
     
@@ -296,7 +308,7 @@ static CGPoint RotateCGPointAroundCenter(CGPoint point, CGPoint center, float an
             CGAffineTransform rotateTransform = CGAffineTransformMakeRotation(M_PI);
             _startButton.transform = CGAffineTransformConcat(scaleTransform, rotateTransform);
             _startButton.tintColor = [UIColor colorWithRed:207/255.0f green:53/255.0 blue:53/255.0 alpha:1];
-            self.backgroundColor = [UIColor colorWithWhite:0 alpha:.4f];
+            self.backgroundColor = self.fadeBackgroundColor ? self.fadeBackgroundColor : [UIColor clearColor];
         }
         else{
             _startButton.transform = CGAffineTransformIdentity;

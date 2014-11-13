@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UIImage *highlightedImage;
 @property (nonatomic, strong) UIImage *contentImage;
 @property (nonatomic, strong) UIImage *highlightedContentImage;
+@property (nonatomic, strong) UIColor *fadeBackgroundColor;
 
 @property (nonatomic, assign) CGFloat nearRadius;
 @property (nonatomic, assign) CGFloat endRadius;
@@ -47,4 +48,6 @@
 - (void)awesomeMenuDidFinishAnimationOpen:(AwesomeMenu *)menu;
 - (void)awesomeMenuWillAnimateOpen:(AwesomeMenu *)menu;
 - (void)awesomeMenuWillAnimateClose:(AwesomeMenu *)menu;
+- (BOOL)awesomeMenuShouldOpen:(AwesomeMenu *)menu;
+- (BOOL)awesomeMenuShouldClose:(AwesomeMenu *)menu;
 @end
